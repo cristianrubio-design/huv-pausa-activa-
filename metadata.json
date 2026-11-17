@@ -1,0 +1,6 @@
+{
+  "name": "HUV Pausa Activa",
+  "description": "Aplicación offline de pausas activas, reseteo mental y autocuidado SST para el personal asistencial del Hospital Universitario del Valle Evaristo García en Cali.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

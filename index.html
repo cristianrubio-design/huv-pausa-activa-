@@ -1,0 +1,2487 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>HUV Pausa Activa — Bienestar Asistencial Offline</title>
+  <meta name="description" content="Pausas activas, micro-mindfulness respiratorio y cápsulas de autocuidado SST para el personal asistencial del Hospital Universitario del Valle Evaristo García, Cali." />
+  <meta property="og:title" content="HUV Pausa Activa — Bienestar Asistencial" />
+  <meta property="og:description" content="Herramienta offline de prevención de fatiga física, sobrecarga postural y estrés agudo para turnos de 6, 12 y 24 horas en el HUV." />
+  <meta property="og:type" content="website" />
+  <meta name="theme-color" content="#005691" />
+  <style>
+    :root {
+      --bg-canvas: #f4f7fa;
+      --bg-surface: #ffffff;
+      --bg-subtle: #eaf0f6;
+      --bg-hover: #e2eaf3;
+      --border-hairline: #d6e0eb;
+      --text-primary: #0f1e2e;
+      --text-secondary: #3f556d;
+      --text-muted: #5d748c;
+      --accent-blue: #005691;
+      --accent-blue-hover: #004373;
+      --accent-blue-soft: rgba(0, 86, 145, 0.1);
+      --accent-mint: #008f5a;
+      --accent-mint-bright: #00a86b;
+      --accent-mint-soft: rgba(0, 168, 107, 0.11);
+      --accent-warn: #9a5200;
+      --accent-warn-soft: rgba(180, 95, 0, 0.1);
+      --shadow-card: 0 1px 3px rgba(15, 30, 46, 0.06), 0 4px 14px rgba(15, 30, 46, 0.04);
+      --shadow-modal: 0 20px 50px rgba(10, 22, 35, 0.22);
+      --header-bg: rgba(255, 255, 255, 0.92);
+      --radius-sm: 10px;
+      --radius-md: 16px;
+      --radius-lg: 22px;
+      --focus-ring: 0 0 0 3px rgba(0, 86, 145, 0.32);
+      --transition-fast: 180ms cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    html[data-theme="dark"] {
+      --bg-canvas: #0b1219;
+      --bg-surface: #121c27;
+      --bg-subtle: #192634;
+      --bg-hover: #213244;
+      --border-hairline: #233446;
+      --text-primary: #edf3f8;
+      --text-secondary: #b7c8d9;
+      --text-muted: #8aa0b6;
+      --accent-blue: #46a0df;
+      --accent-blue-hover: #64b2ea;
+      --accent-blue-soft: rgba(70, 160, 223, 0.15);
+      --accent-mint: #24c98d;
+      --accent-mint-bright: #24c98d;
+      --accent-mint-soft: rgba(36, 201, 141, 0.15);
+      --accent-warn: #f0b15b;
+      --accent-warn-soft: rgba(240, 177, 91, 0.14);
+      --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.35), 0 6px 18px rgba(0, 0, 0, 0.25);
+      --shadow-modal: 0 24px 60px rgba(0, 0, 0, 0.65);
+      --header-bg: rgba(11, 18, 25, 0.92);
+      --focus-ring: 0 0 0 3px rgba(70, 160, 223, 0.4);
+    }
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      -webkit-text-size-adjust: 100%;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Public Sans", "Helvetica Neue", Arial, sans-serif;
+      background-color: var(--bg-canvas);
+      color: var(--text-primary);
+      line-height: 1.55;
+      font-size: 16px;
+      min-height: 100vh;
+      padding-bottom: 84px;
+      transition: background-color var(--transition-fast), color var(--transition-fast);
+    }
+
+    @media (min-width: 768px) {
+      body {
+        padding-bottom: 32px;
+      }
+    }
+
+    html[data-theme="dark"] body {
+      letter-spacing: 0.008em;
+    }
+
+    button, select, input {
+      font-family: inherit;
+      color: inherit;
+    }
+
+    button {
+      cursor: pointer;
+      border: none;
+      background: none;
+      touch-action: manipulation;
+    }
+
+    :focus-visible {
+      outline: none;
+      box-shadow: var(--focus-ring);
+    }
+
+    .tabular {
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* Top Bar (3-zone contract) */
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      background: var(--header-bg);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border-hairline);
+    }
+
+    .topbar-inner {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 0 16px;
+      height: 56px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 24px;
+    }
+
+    @media (min-width: 768px) {
+      .topbar-inner {
+        padding: 0 24px;
+        height: 62px;
+        gap: 32px;
+      }
+    }
+
+    .brand {
+      font-size: 1.05rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--text-primary);
+      text-decoration: none;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .brand-accent {
+      color: var(--accent-blue);
+    }
+
+    .desktop-nav {
+      display: none;
+      align-items: center;
+      gap: 24px;
+    }
+
+    @media (min-width: 768px) {
+      .desktop-nav {
+        display: flex;
+      }
+    }
+
+    .nav-link {
+      font-size: 0.92rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      text-decoration: none;
+      white-space: nowrap;
+      flex-shrink: 0;
+      padding: 8px 2px;
+      border-bottom: 2px solid transparent;
+      transition: color var(--transition-fast), border-color var(--transition-fast);
+    }
+
+    .nav-link:hover,
+    .nav-link.is-active {
+      color: var(--accent-blue);
+      border-bottom-color: var(--accent-blue);
+    }
+
+    .btn-theme {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 44px;
+      padding: 8px 16px;
+      border-radius: var(--radius-sm);
+      background: var(--bg-subtle);
+      color: var(--text-primary);
+      font-size: 0.875rem;
+      font-weight: 600;
+      white-space: nowrap;
+      flex-shrink: 0;
+      border: 1px solid var(--border-hairline);
+      transition: background-color var(--transition-fast), transform var(--transition-fast);
+    }
+
+    .btn-theme:hover {
+      background: var(--bg-hover);
+    }
+
+    .btn-theme:active {
+      transform: scale(0.98);
+    }
+
+    /* Main Container */
+    .container {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 20px 16px 40px;
+      display: flex;
+      flex-direction: column;
+      gap: 32px;
+    }
+
+    @media (min-width: 768px) {
+      .container {
+        padding: 28px 24px 48px;
+        gap: 40px;
+      }
+    }
+
+    /* Hero & Shift Profile Section */
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 20px;
+      align-items: stretch;
+    }
+
+    @media (min-width: 960px) {
+      .hero-grid {
+        grid-template-columns: 1.25fr 0.75fr;
+        gap: 24px;
+      }
+    }
+
+    .card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-hairline);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-card);
+      padding: 20px;
+    }
+
+    @media (min-width: 768px) {
+      .card {
+        padding: 24px;
+      }
+    }
+
+    .hero-kicker {
+      font-size: 0.84rem;
+      font-weight: 600;
+      color: var(--accent-mint);
+      margin-bottom: 8px;
+    }
+
+    .hero-title {
+      font-size: clamp(1.55rem, 2.8vw, 2.2rem);
+      line-height: 1.18;
+      font-weight: 700;
+      letter-spacing: -0.025em;
+      color: var(--text-primary);
+      text-wrap: balance;
+      margin-bottom: 10px;
+    }
+
+    .hero-desc {
+      color: var(--text-secondary);
+      font-size: 0.96rem;
+      max-width: 62ch;
+      margin-bottom: 20px;
+    }
+
+    /* Quick Shift Configurator */
+    .profile-controls {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border-hairline);
+    }
+
+    .control-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .control-label {
+      font-size: 0.84rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+    }
+
+    .seg-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .seg-btn {
+      min-height: 44px;
+      padding: 8px 14px;
+      border-radius: var(--radius-sm);
+      background: var(--bg-subtle);
+      border: 1px solid transparent;
+      color: var(--text-secondary);
+      font-size: 0.875rem;
+      font-weight: 600;
+      white-space: nowrap;
+      flex-shrink: 0;
+      transition: background-color var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast), transform var(--transition-fast);
+    }
+
+    .seg-btn:hover {
+      background: var(--bg-hover);
+      color: var(--text-primary);
+    }
+
+    .seg-btn:active {
+      transform: scale(0.98);
+    }
+
+    .seg-btn.is-selected {
+      background: var(--accent-blue);
+      color: #ffffff;
+      border-color: var(--accent-blue);
+    }
+
+    .seg-btn.is-time.is-selected {
+      background: var(--accent-mint);
+      border-color: var(--accent-mint);
+      color: #ffffff;
+    }
+
+    /* Shift Summary Card (Module 5 + Quick Action) */
+    .shift-summary-card {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 18px;
+    }
+
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      padding: 14px 0;
+      border-top: 1px solid var(--border-hairline);
+      border-bottom: 1px solid var(--border-hairline);
+    }
+
+    .stat-cell {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .stat-val {
+      font-size: 1.65rem;
+      font-weight: 700;
+      line-height: 1.15;
+      color: var(--accent-blue);
+    }
+
+    .stat-val.is-mint {
+      color: var(--accent-mint);
+    }
+
+    .stat-lbl {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .recommendation-box {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .rec-meta {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+    }
+
+    .rec-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .btn-primary {
+      min-height: 48px;
+      padding: 12px 20px;
+      border-radius: var(--radius-sm);
+      background: var(--accent-blue);
+      color: #ffffff;
+      font-size: 0.95rem;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      white-space: nowrap;
+      transition: background-color var(--transition-fast), transform var(--transition-fast);
+    }
+
+    .btn-primary:hover {
+      background: var(--accent-blue-hover);
+    }
+
+    .btn-primary:active {
+      transform: scale(0.985);
+    }
+
+    .btn-mint {
+      background: var(--accent-mint);
+    }
+
+    .btn-mint:hover {
+      background: #007a4c;
+    }
+
+    html[data-theme="dark"] .btn-mint:hover {
+      background: #1eb47e;
+    }
+
+    .btn-secondary {
+      min-height: 44px;
+      padding: 10px 16px;
+      border-radius: var(--radius-sm);
+      background: var(--bg-subtle);
+      border: 1px solid var(--border-hairline);
+      color: var(--text-primary);
+      font-size: 0.9rem;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      white-space: nowrap;
+      transition: background-color var(--transition-fast), transform var(--transition-fast);
+    }
+
+    .btn-secondary:hover {
+      background: var(--bg-hover);
+    }
+
+    /* Feedback Banner (Motivational HUV Recognition) */
+    .recognition-banner {
+      display: none;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 16px 20px;
+      border-radius: var(--radius-md);
+      background: var(--accent-mint-soft);
+      border: 1px solid var(--accent-mint);
+      color: var(--text-primary);
+    }
+
+    .recognition-banner.is-visible {
+      display: flex;
+      animation: fadeSlideIn 220ms cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .recognition-text {
+      font-size: 0.95rem;
+      font-weight: 600;
+      line-height: 1.45;
+    }
+
+    /* Section Headers */
+    .section-block {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      scroll-margin-top: 76px;
+    }
+
+    .section-header {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    @media (min-width: 768px) {
+      .section-header-row {
+        display: flex;
+        align-items: flex-end;
+        justify-content: space-between;
+        gap: 20px;
+      }
+    }
+
+    .section-title {
+      font-size: clamp(1.25rem, 2vw, 1.55rem);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      color: var(--text-primary);
+    }
+
+    .section-subtitle {
+      font-size: 0.94rem;
+      color: var(--text-secondary);
+      max-width: 66ch;
+    }
+
+    /* Filter Bar */
+    .filter-scroll {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+      scrollbar-width: thin;
+    }
+
+    .filter-btn {
+      min-height: 44px;
+      padding: 8px 15px;
+      border-radius: var(--radius-sm);
+      background: var(--bg-surface);
+      border: 1px solid var(--border-hairline);
+      color: var(--text-secondary);
+      font-size: 0.875rem;
+      font-weight: 600;
+      white-space: nowrap;
+      flex-shrink: 0;
+      transition: background-color var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast);
+    }
+
+    .filter-btn:hover {
+      background: var(--bg-subtle);
+      color: var(--text-primary);
+    }
+
+    .filter-btn.is-active {
+      background: var(--accent-blue);
+      border-color: var(--accent-blue);
+      color: #ffffff;
+    }
+
+    /* Exercises Grid */
+    .exercises-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+
+    @media (min-width: 680px) {
+      .exercises-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (min-width: 1060px) {
+      .exercises-grid {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    .exercise-card {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 14px;
+      transition: border-color var(--transition-fast), transform var(--transition-fast);
+    }
+
+    .exercise-card:hover {
+      border-color: var(--accent-blue);
+    }
+
+    .exercise-card.is-recommended {
+      border-color: var(--accent-mint);
+    }
+
+    .ex-meta {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      font-weight: 500;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .ex-rec-flag {
+      color: var(--accent-mint);
+      font-weight: 700;
+    }
+
+    .ex-title {
+      font-size: 1.08rem;
+      font-weight: 700;
+      line-height: 1.3;
+      color: var(--text-primary);
+      margin-top: 4px;
+    }
+
+    .ex-anatomy {
+      font-size: 0.87rem;
+      color: var(--accent-blue);
+      font-weight: 600;
+      margin-top: 4px;
+    }
+
+    .ex-steps {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      padding-top: 10px;
+      border-top: 1px solid var(--border-hairline);
+    }
+
+    .ex-steps li {
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
+    }
+
+    .step-num {
+      font-weight: 700;
+      color: var(--accent-blue);
+      font-variant-numeric: tabular-nums;
+      flex-shrink: 0;
+    }
+
+    .ex-contra {
+      font-size: 0.82rem;
+      color: var(--accent-warn);
+      background: var(--accent-warn-soft);
+      padding: 10px 12px;
+      border-radius: var(--radius-sm);
+      line-height: 1.45;
+    }
+
+    .ex-actions {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding-top: 6px;
+    }
+
+    .ex-actions .btn-primary {
+      width: 100%;
+      min-height: 44px;
+    }
+
+    /* Module 3: Breathing & Post-Critical Decompression */
+    .mindfulness-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 20px;
+    }
+
+    @media (min-width: 920px) {
+      .mindfulness-grid {
+        grid-template-columns: 1.2fr 0.8fr;
+      }
+    }
+
+    .breath-card {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .breath-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .breath-stage {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px 16px;
+      border-radius: var(--radius-md);
+      background: var(--bg-subtle);
+      min-height: 290px;
+      gap: 18px;
+    }
+
+    .breath-orb-wrap {
+      position: relative;
+      width: 186px;
+      height: 186px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .breath-ring-outer {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      border: 2px dashed var(--border-hairline);
+    }
+
+    .breath-orb {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 35% 35%, var(--accent-mint-bright), var(--accent-blue));
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      box-shadow: 0 10px 30px rgba(0, 86, 145, 0.25);
+      transform: scale(0.86);
+      transition: transform 0.6s ease-in-out;
+      will-change: transform;
+    }
+
+    .breath-phase-label {
+      font-size: 0.95rem;
+      font-weight: 700;
+      letter-spacing: 0.01em;
+    }
+
+    .breath-phase-sec {
+      font-size: 1.85rem;
+      font-weight: 700;
+      line-height: 1.1;
+    }
+
+    .breath-status-line {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      text-align: center;
+    }
+
+    .breath-controls {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+
+    .decompression-card {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 18px;
+    }
+
+    .decomp-list {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .decomp-item {
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--border-hairline);
+    }
+
+    .decomp-item:last-child {
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
+    .decomp-idx {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--accent-blue-soft);
+      color: var(--accent-blue);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.9rem;
+      flex-shrink: 0;
+    }
+
+    .decomp-item.is-active-step .decomp-idx {
+      background: var(--accent-mint);
+      color: #ffffff;
+    }
+
+    .decomp-title {
+      font-size: 0.98rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 2px;
+    }
+
+    .decomp-body {
+      font-size: 0.88rem;
+      color: var(--text-secondary);
+    }
+
+    /* Module 4: Self-care Capsules */
+    .capsules-controls {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .carousel-nav {
+      display: flex;
+      gap: 8px;
+    }
+
+    .capsules-track {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+
+    @media (min-width: 700px) {
+      .capsules-track {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (min-width: 1060px) {
+      .capsules-track {
+        grid-template-columns: repeat(4, 1fr);
+      }
+    }
+
+    .capsule-card {
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .capsule-kicker {
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--accent-mint);
+    }
+
+    .capsule-title {
+      font-size: 1rem;
+      font-weight: 700;
+      line-height: 1.35;
+      color: var(--text-primary);
+    }
+
+    .capsule-body {
+      font-size: 0.88rem;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+
+    .capsule-foot {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      padding-top: 10px;
+      border-top: 1px solid var(--border-hairline);
+    }
+
+    /* Module 5: Shift Log */
+    .log-card {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .log-header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .log-list {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .log-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--border-hairline);
+      font-size: 0.9rem;
+    }
+
+    .log-row:last-child {
+      border-bottom: none;
+    }
+
+    .log-empty {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      padding: 12px 0;
+    }
+
+    /* Guided Exercise Modal / Bottom Sheet */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 60;
+      background: rgba(8, 16, 24, 0.65);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: flex-end;
+      justify-content: center;
+      padding: 0;
+    }
+
+    @media (min-width: 640px) {
+      .modal-backdrop {
+        align-items: center;
+        padding: 20px;
+      }
+    }
+
+    .modal-backdrop.is-open {
+      display: flex;
+    }
+
+    .modal-panel {
+      width: 100%;
+      max-width: 560px;
+      max-height: 92vh;
+      overflow-y: auto;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-hairline);
+      border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+      box-shadow: var(--shadow-modal);
+      padding: 20px 20px 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    @media (min-width: 640px) {
+      .modal-panel {
+        border-radius: var(--radius-lg);
+        padding: 26px;
+      }
+    }
+
+    .modal-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .modal-close {
+      min-width: 44px;
+      min-height: 44px;
+      border-radius: var(--radius-sm);
+      background: var(--bg-subtle);
+      color: var(--text-primary);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .modal-timer-box {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 16px 18px;
+      border-radius: var(--radius-md);
+      background: var(--bg-subtle);
+    }
+
+    .modal-countdown {
+      font-size: 2.35rem;
+      font-weight: 700;
+      color: var(--accent-blue);
+      line-height: 1;
+    }
+
+    .progress-track {
+      width: 100%;
+      height: 8px;
+      border-radius: 999px;
+      background: var(--border-hairline);
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: var(--accent-mint);
+      transition: width 300ms linear;
+    }
+
+    .modal-step-card {
+      padding: 16px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-hairline);
+      background: var(--bg-canvas);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .modal-step-kicker {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--accent-mint);
+    }
+
+    .modal-step-text {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      line-height: 1.45;
+    }
+
+    .modal-actions {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    /* Mobile Fixed Bottom Tab Bar (< 15% viewport height) */
+    .mobile-tabbar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      z-index: 45;
+      background: var(--header-bg);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-top: 1px solid var(--border-hairline);
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      height: 62px;
+      padding-bottom: env(safe-area-inset-bottom, 0px);
+    }
+
+    @media (min-width: 768px) {
+      .mobile-tabbar {
+        display: none;
+      }
+    }
+
+    .tab-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      min-height: 44px;
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.72rem;
+      font-weight: 600;
+    }
+
+    .tab-item.is-active {
+      color: var(--accent-blue);
+    }
+
+    .footer {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 16px 16px 24px;
+      border-top: 1px solid var(--border-hairline);
+      color: var(--text-muted);
+      font-size: 0.82rem;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    @media (min-width: 768px) {
+      .footer {
+        padding: 20px 24px 28px;
+      }
+    }
+
+    @keyframes fadeSlideIn {
+      from { opacity: 0; transform: translateY(-6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Bar (3 zones: Brand, Nav Links, Primary Theme Toggle) -->
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a href="#inicio" class="brand">HUV <span class="brand-accent">Pausa Activa</span></a>
+
+      <nav class="desktop-nav" aria-label="Secciones principales">
+        <a href="#pausas" class="nav-link is-active" data-nav="pausas">Pausas</a>
+        <a href="#respiracion" class="nav-link" data-nav="respiracion">Respiración</a>
+        <a href="#autocuidado" class="nav-link" data-nav="autocuidado">Autocuidado</a>
+        <a href="#mi-turno" class="nav-link" data-nav="mi-turno">Mi Turno</a>
+      </nav>
+
+      <button type="button" id="themeToggleBtn" class="btn-theme" aria-label="Cambiar modo visual claro u oscuro">
+        <svg id="themeIcon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+        </svg>
+        <span id="themeLabel">Modo noche</span>
+      </button>
+    </div>
+  </header>
+
+  <main class="container" id="inicio">
+
+    <!-- Motivational Banner -->
+    <div id="recognitionBanner" class="recognition-banner" role="status" aria-live="polite">
+      <p id="recognitionText" class="recognition-text"></p>
+      <button type="button" id="closeBannerBtn" class="btn-secondary" style="min-height:40px;padding:6px 12px;">Cerrar</button>
+    </div>
+
+    <!-- Module 1 & Module 5 Summary: Quick Shift Setup + Shift Recognition -->
+    <section class="hero-grid" aria-label="Perfil rápido de turno y resumen">
+      <article class="card">
+        <p class="hero-kicker">Hospital Universitario del Valle "Evaristo García" · Cali</p>
+        <h1 class="hero-title">Cuida tu cuerpo y mente en medio de la guardia</h1>
+        <p class="hero-desc">
+          Rutinas breves de descarga osteomuscular y regulación autonómica diseñadas para turnos de 6, 12 y 24 horas. Funciona sin conexión en cualquier servicio asistencial.
+        </p>
+
+        <div class="profile-controls">
+          <div class="control-group">
+            <span class="control-label">1. Tu rol asistencial</span>
+            <div class="seg-grid" id="roleSelector" role="group" aria-label="Rol asistencial">
+              <button type="button" class="seg-btn" data-role="Médico">Médico</button>
+              <button type="button" class="seg-btn" data-role="Enfermería">Enfermería</button>
+              <button type="button" class="seg-btn" data-role="Terapia">Terapia</button>
+              <button type="button" class="seg-btn" data-role="Camilla-Transporte">Camilla-Transporte</button>
+            </div>
+          </div>
+
+          <div class="control-group">
+            <span class="control-label">2. Servicio o área actual</span>
+            <div class="seg-grid" id="areaSelector" role="group" aria-label="Área del hospital">
+              <button type="button" class="seg-btn" data-area="Urgencias">Urgencias</button>
+              <button type="button" class="seg-btn" data-area="UCI">UCI</button>
+              <button type="button" class="seg-btn" data-area="Salas de Cirugía">Salas de Cirugía</button>
+              <button type="button" class="seg-btn" data-area="Hospitalización General">Hospitalización General</button>
+            </div>
+          </div>
+
+          <div class="control-group">
+            <span class="control-label">3. Tiempo disponible ahora</span>
+            <div class="seg-grid" id="timeSelector" role="group" aria-label="Tiempo disponible">
+              <button type="button" class="seg-btn is-time" data-time="60">Micro-pausa 60 s</button>
+              <button type="button" class="seg-btn is-time" data-time="120">Tengo 2 minutos</button>
+              <button type="button" class="seg-btn is-time" data-time="300">Tengo 5 minutos</button>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <aside class="card shift-summary-card" aria-label="Progreso del turno">
+        <div>
+          <p class="control-label">Registro de autocuidado en turno</p>
+          <p id="activeProfileSummary" class="rec-meta" style="margin-top:4px;"></p>
+        </div>
+
+        <div class="stats-row">
+          <div class="stat-cell">
+            <span id="statPauses" class="stat-val tabular">0</span>
+            <span class="stat-lbl">Pausas hoy</span>
+          </div>
+          <div class="stat-cell">
+            <span id="statMinutes" class="stat-val is-mint tabular">0 min</span>
+            <span class="stat-lbl">Tiempo para ti</span>
+          </div>
+          <div class="stat-cell">
+            <span id="statStreak" class="stat-val tabular">0 d</span>
+            <span class="stat-lbl">Racha diaria</span>
+          </div>
+        </div>
+
+        <div class="recommendation-box">
+          <span class="rec-meta" id="recMeta">Sugerencia prioritaria para tu perfil</span>
+          <h2 class="rec-title" id="recTitle">Descompresión cervical asistencial</h2>
+          <p class="rec-meta" id="recReason"></p>
+        </div>
+
+        <button type="button" id="startRecommendedBtn" class="btn-primary btn-mint">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><polygon points="6 4 20 12 6 20 6 4"></polygon></svg>
+          Iniciar pausa sugerida
+        </button>
+      </aside>
+    </section>
+
+    <!-- Module 2: Catalog of Active Pauses & Guided Routines -->
+    <section id="pausas" class="section-block">
+      <div class="section-header-row">
+        <div class="section-header">
+          <h2 class="section-title">Pausas activas y descarga osteomuscular</h2>
+          <p class="section-subtitle">
+            Ejercicios clínicos de ejecución en estación de trabajo o pasillo sin requerir colchonetas ni cambio de uniforme.
+          </p>
+        </div>
+      </div>
+
+      <div class="filter-scroll" id="zoneFilterBar" role="tablist" aria-label="Filtrar ejercicios por zona anatómica">
+        <button type="button" class="filter-btn is-active" data-zone="Todas">Todas (10)</button>
+        <button type="button" class="filter-btn" data-zone="Cuello y Columna Cervical">Cuello y Cervical</button>
+        <button type="button" class="filter-btn" data-zone="Espalda Baja y Zona Lumbar">Espalda Baja</button>
+        <button type="button" class="filter-btn" data-zone="Muñecas, Manos y Antebrazos">Muñecas y Manos</button>
+        <button type="button" class="filter-btn" data-zone="Piernas y Retorno Venoso">Piernas y Retorno</button>
+        <button type="button" class="filter-btn" data-zone="Descarga Ocular">Descarga Ocular</button>
+      </div>
+
+      <div id="exercisesGrid" class="exercises-grid"></div>
+    </section>
+
+    <!-- Module 3: Express Relaxation & Mental Reset -->
+    <section id="respiracion" class="section-block">
+      <div class="section-header">
+        <h2 class="section-title">Relajación exprés y reseteo mental</h2>
+        <p class="section-subtitle">
+          Regulación autonómica guiada con síntesis sonora local mediante Web Audio API para reducir taquicardia y sobrecarga emocional en el turno.
+        </p>
+      </div>
+
+      <div class="mindfulness-grid">
+        <!-- Breathing Timer -->
+        <article class="card breath-card">
+          <div class="breath-toolbar">
+            <div class="seg-grid" role="group" aria-label="Técnica de respiración">
+              <button type="button" class="seg-btn is-selected" id="modeBoxBtn" data-breath-mode="box">Cuadrada 4-4-4-4</button>
+              <button type="button" class="seg-btn" id="mode478Btn" data-breath-mode="478">Calma 4-7-8</button>
+            </div>
+            <button type="button" id="audioToggleBtn" class="btn-secondary" aria-pressed="true">
+              <svg id="audioIcon" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+                <path d="M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+              </svg>
+              <span id="audioLabel">Sonido activo</span>
+            </button>
+          </div>
+
+          <p id="breathDescription" class="rec-meta">
+            Respiración cuadrada (4 s inhala · 4 s sostén · 4 s exhala · 4 s pausa): equilibra foco y atención entre procedimientos.
+          </p>
+
+          <div class="breath-stage">
+            <div class="breath-orb-wrap">
+              <div class="breath-ring-outer" aria-hidden="true"></div>
+              <div id="breathOrb" class="breath-orb">
+                <span id="breathPhaseText" class="breath-phase-label">Listo</span>
+                <span id="breathCountdown" class="breath-phase-sec tabular">04</span>
+              </div>
+            </div>
+            <p id="breathCycleInfo" class="breath-status-line tabular">Ciclo 0 de 4 · Pulsa Iniciar para comenzar</p>
+          </div>
+
+          <div class="breath-controls">
+            <button type="button" id="breathStartBtn" class="btn-primary">Iniciar respiración</button>
+            <button type="button" id="breathResetBtn" class="btn-secondary">Reiniciar</button>
+          </div>
+        </article>
+
+        <!-- Post-Critical Event Decompression -->
+        <article class="card decompression-card">
+          <div>
+            <p class="hero-kicker">Protocolo post-evento crítico</p>
+            <h3 class="section-title" style="font-size:1.2rem;margin-bottom:6px;">Descompresión en 3 pasos</h3>
+            <p class="rec-meta">
+              Úsalo tras código azul, reanimación, noticia difícil o situación de alto impacto emocional antes de retomar historia clínica o atención.
+            </p>
+          </div>
+
+          <div class="decomp-list" id="decompSteps">
+            <div class="decomp-item" data-dstep="0">
+              <div class="decomp-idx tabular">1</div>
+              <div>
+                <h4 class="decomp-title">Cierra los ojos (15 s)</h4>
+                <p class="decomp-body">Aparta la mirada de monitores, alarmas y pantallas. Permite que la corteza visual descanse un instante.</p>
+              </div>
+            </div>
+            <div class="decomp-item" data-dstep="1">
+              <div class="decomp-idx tabular">2</div>
+              <div>
+                <h4 class="decomp-title">Descarga el peso a los talones (15 s)</h4>
+                <p class="decomp-body">Desbloquea ligeramente las rodillas, suelta los hombros lejos de las orejas y siente el contacto firme del calzado con el piso.</p>
+              </div>
+            </div>
+            <div class="decomp-item" data-dstep="2">
+              <div class="decomp-idx tabular">3</div>
+              <div>
+                <h4 class="decomp-title">Exhala el turno (15 s)</h4>
+                <p class="decomp-body">Inhala suave por nariz en 4 segundos y exhala largo por la boca soltando la tensión acumulada del evento.</p>
+              </div>
+            </div>
+          </div>
+
+          <div style="display:flex;flex-direction:column;gap:8px;">
+            <p id="decompTimerStatus" class="rec-meta tabular">Duración total: 45 segundos guiados</p>
+            <button type="button" id="decompStartBtn" class="btn-primary btn-mint">Guiar descompresión (45 s)</button>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- Module 4: Self-Care Capsules (Cali / HUV Context) -->
+    <section id="autocuidado" class="section-block">
+      <div class="section-header-row">
+        <div class="section-header">
+          <h2 class="section-title">Cápsulas de autocuidado asistencial</h2>
+          <p class="section-subtitle">
+            Recomendaciones prácticas adaptadas al clima cálido de Cali, uso continuo de EPP y exigencia física en el HUV.
+          </p>
+        </div>
+        <div class="carousel-nav">
+          <button type="button" id="prevCapsulesBtn" class="btn-secondary" aria-label="Ver cápsulas anteriores">Anterior</button>
+          <button type="button" id="nextCapsulesBtn" class="btn-secondary" aria-label="Ver cápsulas siguientes">Siguiente</button>
+        </div>
+      </div>
+
+      <div class="filter-scroll" id="capsuleFilterBar" role="tablist" aria-label="Filtrar cápsulas de autocuidado">
+        <button type="button" class="filter-btn is-active" data-cap-cat="Todas">Todas (8)</button>
+        <button type="button" class="filter-btn" data-cap-cat="Hidratación y Clima">Hidratación y Clima</button>
+        <button type="button" class="filter-btn" data-cap-cat="Higiene Postural">Higiene Postural</button>
+        <button type="button" class="filter-btn" data-cap-cat="Cuidado Cutáneo">Cuidado Cutáneo</button>
+        <button type="button" class="filter-btn" data-cap-cat="Nutrición en Guardia">Nutrición en Guardia</button>
+      </div>
+
+      <div id="capsulesGrid" class="capsules-track"></div>
+    </section>
+
+    <!-- Module 5: Shift Activity History -->
+    <section id="mi-turno" class="section-block">
+      <article class="card log-card">
+        <div class="log-header">
+          <div>
+            <h2 class="section-title" style="font-size:1.22rem;">Historial de pausas en este turno</h2>
+            <p class="rec-meta">Guardado localmente en este dispositivo · Sin transmisión a servidores externos</p>
+          </div>
+          <button type="button" id="resetShiftBtn" class="btn-secondary">Iniciar nuevo turno</button>
+        </div>
+
+        <div id="shiftLogList" class="log-list"></div>
+      </article>
+    </section>
+
+  </main>
+
+  <footer class="footer">
+    <span>Hospital Universitario del Valle "Evaristo García" · Bienestar y SST Asistencial</span>
+    <span>Funcionamiento 100% autónomo y offline en dispositivo</span>
+  </footer>
+
+  <!-- Mobile Bottom Navigation -->
+  <nav class="mobile-tabbar" aria-label="Navegación rápida móvil">
+    <a href="#pausas" class="tab-item is-active" data-nav="pausas">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M18 8h1a4 4 0 0 1 0 8h-1"></path><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"></path><line x1="6" y1="1" x2="6" y2="4"></line><line x1="10" y1="1" x2="10" y2="4"></line><line x1="14" y1="1" x2="14" y2="4"></line>
+      </svg>
+      <span>Pausas</span>
+    </a>
+    <a href="#respiracion" class="tab-item" data-nav="respiracion">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <circle cx="12" cy="12" r="9"></circle><path d="M8 12s1.5-2 4-2 4 2 4 2"></path>
+      </svg>
+      <span>Respirar</span>
+    </a>
+    <a href="#autocuidado" class="tab-item" data-nav="autocuidado">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
+      </svg>
+      <span>Cápsulas</span>
+    </a>
+    <a href="#mi-turno" class="tab-item" data-nav="mi-turno">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+      </svg>
+      <span>Mi Turno</span>
+    </a>
+  </nav>
+
+  <!-- Guided Routine Modal -->
+  <div id="exerciseModal" class="modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-panel">
+      <div class="modal-top">
+        <div>
+          <p id="modalZoneMeta" class="ex-meta"></p>
+          <h2 id="modalTitle" class="section-title" style="font-size:1.25rem;margin-top:4px;"></h2>
+        </div>
+        <button type="button" id="closeModalBtn" class="modal-close" aria-label="Cerrar rutina guiada">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <div class="modal-timer-box">
+        <div>
+          <span class="control-label">Tiempo restante</span>
+          <div id="modalCountdown" class="modal-countdown tabular">01:00</div>
+        </div>
+        <button type="button" id="modalPauseBtn" class="btn-secondary">Pausar</button>
+      </div>
+
+      <div class="progress-track" aria-hidden="true">
+        <div id="modalProgressFill" class="progress-fill"></div>
+      </div>
+
+      <div class="modal-step-card">
+        <span id="modalStepKicker" class="modal-step-kicker tabular">Paso 1 de 3</span>
+        <p id="modalStepText" class="modal-step-text"></p>
+      </div>
+
+      <div id="modalContraBox" class="ex-contra"></div>
+
+      <div class="modal-actions">
+        <button type="button" id="modalPrevStepBtn" class="btn-secondary">Paso anterior</button>
+        <button type="button" id="modalCompleteBtn" class="btn-primary btn-mint">Completar pausa</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      "use strict";
+
+      /* =========================================================
+         1. LOCAL OFFLINE KNOWLEDGE BASE (HUV / CALI SST)
+         ========================================================= */
+      const EXERCISES = [
+        {
+          id: "cervical-retraccion",
+          name: "Retracción cervical y descarga de trapecio",
+          durationSec: 60,
+          zone: "Cuello y Columna Cervical",
+          anatomy: "Músculos suboccipitales, trapecio superior y vértebras C1–C7",
+          roles: ["Médico", "Enfermería", "Terapia"],
+          areas: ["UCI", "Urgencias", "Hospitalización General"],
+          steps: [
+            "Ponte de pie o sentado con espalda recta y mirada al frente.",
+            "Lleva el mentón suavemente hacia atrás (gesto de doble mentón) sin inclinar la cabeza abajo; sostén 5 segundos y suelta.",
+            "Inclina la oreja derecha hacia el hombro derecho manteniendo el hombro izquierdo abajo por 15 segundos; repite al otro lado."
+          ],
+          contraindications: "Evitar en hernia discal cervical sintomática aguda, radiculopatía activa o vértigo posicional."
+        },
+        {
+          id: "cervical-escapular",
+          name: "Apertura torácica y retracción escapular",
+          durationSec: 90,
+          zone: "Cuello y Columna Cervical",
+          anatomy: "Pectoral menor, romboides, trapecio medio y cintura escapular",
+          roles: ["Médico", "Enfermería", "Salas de Cirugía"],
+          areas: ["Salas de Cirugía", "UCI", "Urgencias"],
+          steps: [
+            "Entrelaza los dedos detrás de la espalda baja o sujeta el borde de una bata/cinturón con los codos estirados.",
+            "Lleva ambos hombros hacia atrás y abajo juntando suavemente los omóplatos.",
+            "Eleva ligeramente el esternón mientras inhalas profundo 3 veces y mantén 20 segundos sin arquear la zona lumbar."
+          ],
+          contraindications: "Suspender si aparece dolor punzante anterior en hombro (pinzamiento subacromial o luxación reciente)."
+        },
+        {
+          id: "lumbar-extension",
+          name: "Extensión lumbar de pie tras movilización",
+          durationSec: 60,
+          zone: "Espalda Baja y Zona Lumbar",
+          anatomy: "Erectores espinales lumbares, cuadrado lumbar y discos L4–S1",
+          roles: ["Enfermería", "Camilla-Transporte", "Terapia"],
+          areas: ["Urgencias", "Hospitalización General", "UCI"],
+          steps: [
+            "Coloca los pies al ancho de los hombros y apoya ambas palmas sobre la zona lumbar (dedos apuntando hacia abajo).",
+            "Extiende suavemente el tronco hacia atrás mirando hacia el horizonte, sin forzar el cuello.",
+            "Mantén 5 segundos exhalando lento, regresa al centro y repite 5 veces."
+          ],
+          contraindications: "No realizar en estenosis del canal lumbar sintomática, espondilolistesis inestable o lumbalgia aguda con irradiación."
+        },
+        {
+          id: "lumbar-bascula",
+          name: "Báscula pélvica y descarga de psoas",
+          durationSec: 120,
+          zone: "Espalda Baja y Zona Lumbar",
+          anatomy: "Flexores de cadera (iliopsoas), musculatura paravertebral y pelvis",
+          roles: ["Camilla-Transporte", "Enfermería", "Médico"],
+          areas: ["Salas de Cirugía", "Urgencias", "Hospitalización General"],
+          steps: [
+            "Adelanta un pie en paso corto (zancada suave) con la rodilla trasera ligeramente flexionada.",
+            "Activa suavemente el abdomen y lleva el pubis hacia adelante basculando la pelvis hasta sentir alivio en la cadera trasera.",
+            "Sostén 25 segundos por lado respirando lento; apóyate en un mesón si necesitas estabilidad."
+          ],
+          contraindications: "Precaución ante dolor agudo en articulación sacroilíaca o prótesis de cadera reciente."
+        },
+        {
+          id: "muneca-carpiano",
+          name: "Deslizamiento tendinoso para túnel carpiano",
+          durationSec: 60,
+          zone: "Muñecas, Manos y Antebrazos",
+          anatomy: "Nervio mediano, tendones flexores superficiales/profundos y retináculo flexor",
+          roles: ["Médico", "Enfermería", "Terapia"],
+          areas: ["Urgencias", "UCI", "Salas de Cirugía", "Hospitalización General"],
+          steps: [
+            "Extiende el brazo derecho al frente con codo estirado y palma mirando arriba.",
+            "Con la mano izquierda, lleva suavemente los dedos derechos (incluido el pulgar) hacia abajo hasta sentir estiramiento en antebrazo.",
+            "Sostén 15 segundos por mano; luego abre y cierra los dedos en abanico 10 veces sin tensión."
+          ],
+          contraindications: "Detener si genera hormigueo intenso (parestesias) en pulgar, índice o dedo medio o en tendinitis de De Quervain aguda."
+        },
+        {
+          id: "muneca-extensores",
+          name: "Descarga de extensores tras suturas y digitación",
+          durationSec: 60,
+          zone: "Muñecas, Manos y Antebrazos",
+          anatomy: "Extensores radiales del carpo, epicóndilo lateral y fascia antebraquial",
+          roles: ["Médico", "Enfermería"],
+          areas: ["Salas de Cirugía", "Urgencias", "Hospitalización General"],
+          steps: [
+            "Extiende un brazo al frente con el dorso de la mano mirando hacia arriba y el puño suavemente cerrado.",
+            "Con la otra mano flexiona la muñeca hacia abajo y ligeramente hacia afuera.",
+            "Sostén 15 segundos por lado y finaliza rotando suavemente ambas muñecas en círculos amplios 8 veces."
+          ],
+          contraindications: "No forzar en epicondilitis lateral aguda (codo de tenista) con dolor mayor a 3/10."
+        },
+        {
+          id: "piernas-bomba-gemelar",
+          name: "Bomba gemelar para retorno venoso",
+          durationSec: 60,
+          zone: "Piernas y Retorno Venoso",
+          anatomy: "Tríceps sural (gastrocnemio y sóleo) y sistema venoso profundo de miembros inferiores",
+          roles: ["Camilla-Transporte", "Enfermería", "Médico", "Terapia"],
+          areas: ["Salas de Cirugía", "Urgencias", "UCI", "Hospitalización General"],
+          steps: [
+            "Ponte de pie junto a una camilla, escritorio o estación de enfermería con apoyo ligero de dedos si es necesario.",
+            "Eleva ambos talones despegándolos del suelo hasta quedar en puntas de pie durante 2 segundos.",
+            "Desciende lento apoyando talones y levanta las puntas de los pies; completa 20 repeticiones fluidas."
+          ],
+          contraindications: "Evitar en trombosis venosa profunda sospechada, esguince reciente de tobillo o fascitis plantar aguda."
+        },
+        {
+          id: "piernas-marcha-estacion",
+          name: "Descarga plantar y movilidad de cadera en estación",
+          durationSec: 120,
+          zone: "Piernas y Retorno Venoso",
+          anatomy: "Fascia plantar, glúteo medio y articulación tibioastragalina",
+          roles: ["Enfermería", "Camilla-Transporte", "Terapia"],
+          areas: ["Hospitalización General", "Urgencias", "UCI"],
+          steps: [
+            "Realiza transferencia de peso lateral suave de un pie al otro durante 20 segundos manteniendo rodillas blandas.",
+            "Eleva alternadamente una rodilla al nivel de la cadera durante 30 segundos a ritmo calmado.",
+            "Finaliza realizando 10 círculos de tobillo en el aire con cada pierna apoyando una mano en el mesón."
+          ],
+          contraindications: "Realizar siempre cerca de un punto de apoyo estable si hay mareo por ayuno o fatiga nocturna."
+        },
+        {
+          id: "ocular-202020",
+          name: "Regla 20-20-20 y parpadeo lubricante",
+          durationSec: 45,
+          zone: "Descarga Ocular",
+          anatomy: "Músculo ciliar, musculatura extrínseca ocular y glándulas lagrimales",
+          roles: ["Médico", "Enfermería", "Terapia"],
+          areas: ["UCI", "Urgencias", "Hospitalización General"],
+          steps: [
+            "Aparta la vista de monitores multiparámetros o historia clínica y busca un punto lejano a más de 6 metros (pasillo o ventana).",
+            "Fija la mirada relajada en ese punto lejano durante 20 segundos mientras parpadeas lento 10 veces para hidratar la córnea.",
+            "Frota tus palmas 5 segundos para entibiarlas y cúbrete los ojos suavemente sin presionar los globos oculares (palming) por 15 segundos."
+          ],
+          contraindications: "No presionar los párpados si usas lentes de contacto rígidos o tras cirugía ocular reciente; higieniza manos antes si tocas el rostro."
+        },
+        {
+          id: "ocular-movilidad",
+          name: "Relajación visual frente a luz fluorescente",
+          durationSec: 90,
+          zone: "Descarga Ocular",
+          anatomy: "Nervio óptico, músculos rectos oculares y frente (corrugador)",
+          roles: ["Médico", "Enfermería", "Salas de Cirugía"],
+          areas: ["Salas de Cirugía", "UCI", "Urgencias"],
+          steps: [
+            "Sin mover la cabeza, dirige suavemente la mirada hacia arriba 3 segundos y luego hacia abajo 3 segundos (3 ciclos).",
+            "Mira hacia la izquierda y derecha alternadamente sin forzar los extremos.",
+            "Relaja el entrecejo con una exhalación profunda y enfoca primero un objeto cercano (30 cm) y luego uno lejano 5 veces."
+          ],
+          contraindications: "Detener si desencadena cefalea migrañosa activa o diplopía."
+        }
+      ];
+
+      const CAPSULES = [
+        {
+          id: "cap-1",
+          category: "Hidratación y Clima",
+          title: "Hidratación fraccionada en el calor de Cali",
+          body: "Con temperaturas entre 28 °C y 33 °C en el Valle del Cauca, el uso continuo de bata antifluidos y tapabocas N95 incrementa la pérdida hídrica imperceptible. Toma de 150 a 200 ml de agua cada 90 minutos en zona limpia antes de sentir sed.",
+          foot: "Indicador práctico: orina amarillo pálido al finalizar el bloque."
+        },
+        {
+          id: "cap-2",
+          category: "Hidratación y Clima",
+          title: "Recuperación térmica tras traslados y EPP",
+          body: "Tras entregar paciente en camilla o salir de sala con sobrecalentamiento, humedece brevemente muñecas y nuca con agua fresca durante 20 segundos en lavamanos autorizado para acelerar el descenso de temperatura central.",
+          foot: "Evita bebidas ultrazucaradas que aumentan la fatiga posterior."
+        },
+        {
+          id: "cap-3",
+          category: "Higiene Postural",
+          title: "Mecánica corporal al movilizar pacientes",
+          body: "Antes de pasar un paciente de cama a camilla, ajusta ambos planos a la misma altura, separa los pies a la anchura de hombros, flexiona rodillas y mantén el torso cerca de la carga. Gira con los pies, nunca torciendo la columna lumbar.",
+          foot: "Regla HUV: pide apoyo en equipo ante pacientes > 70 kg o dependientes totales."
+        },
+        {
+          id: "cap-4",
+          category: "Higiene Postural",
+          title: "Altura neutra en historia clínica y monitores",
+          body: "Evita inclinar el cuello más de 30° al digitar evoluciones o revisar bombas de infusión. Coloca la pantalla a la altura de tus ojos o eleva ligeramente el teclado portátil cuando registres de pie en el carro de enfermería.",
+          foot: "Cada 15° extra de flexión cervical duplica la carga sobre C5–C6."
+        },
+        {
+          id: "cap-5",
+          category: "Cuidado Cutáneo",
+          title: "Protección facial ante fricción por N95 y careta",
+          body: "En jornadas continuas en UCI o Urgencias, aplica una lámina delgada de apósito hidrocoloide o barrera protectora en puente nasal y arcos cigomáticos antes del turno; nunca sobre piel húmeda ni comprometiendo el sello respiratorio.",
+          foot: "Revisa puntos de presión cada 4 horas al reemplazar el EPP."
+        },
+        {
+          id: "cap-6",
+          category: "Cuidado Cutáneo",
+          title: "Prevención de dermatitis por lavado frecuente",
+          body: "Seca las manos con toalla desechable mediante toques suaves sin frotar vigorosamente. Al terminar tu turno o antes de dormir, aplica crema emoliente sin fragancia con ceramidas o glicerina para restaurar el manto lipídico.",
+          foot: "Evita agua muy caliente al lavarte; el agua tibia protege la barrera dérmica."
+        },
+        {
+          id: "cap-7",
+          category: "Nutrición en Guardia",
+          title: "Snacks de baja carga glucémica en turno nocturno",
+          body: "Entre 00:00 y 04:00 a. m., reemplaza panadería refinada o gaseosas por opciones que estabilicen glucosa y alerta: un puñado de maní o almendras sin sal, huevo cocido, queso campesino fresco o fruta entera con fibra.",
+          foot: "Evita picos de insulina que provocan somnolencia súbita a las 03:30 a. m."
+        },
+        {
+          id: "cap-8",
+          category: "Nutrición en Guardia",
+          title: "Ventana inteligente de cafeína en guardias de 12–24 h",
+          body: "Usa el café estratégicamente al inicio de la noche (20:00–01:00). Limita su consumo en las últimas 4 horas antes de entregar turno a las 07:00 a. m. para no fragmentar tu sueño reparador durante el día.",
+          foot: "Alterna cada taza de café con un vaso completo de agua."
+        }
+      ];
+
+      /* =========================================================
+         2. PERSISTENT STATE (LOCALSTORAGE)
+         ========================================================= */
+      const STORAGE_KEY = "huv_pausa_activa_v1";
+
+      function getTodayISO() {
+        const d = new Date();
+        const yyyy = d.getFullYear();
+        const mm = String(d.getMonth() + 1).padStart(2, "0");
+        const dd = String(d.getDate()).padStart(2, "0");
+        return `${yyyy}-${mm}-${dd}`;
+      }
+
+      const defaultState = {
+        role: "Enfermería",
+        area: "Urgencias",
+        timeBudget: 120,
+        theme: "light",
+        soundEnabled: true,
+        pausasHoy: 0,
+        segundosHoy: 0,
+        rachaDias: 0,
+        lastActiveDate: getTodayISO(),
+        shiftLog: []
+      };
+
+      function loadState() {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          if (!raw) return { ...defaultState };
+          const parsed = JSON.parse(raw);
+          const merged = { ...defaultState, ...parsed };
+          const today = getTodayISO();
+          if (merged.lastActiveDate !== today) {
+            const yesterday = new Date();
+            yesterday.setDate(yesterday.getDate() - 1);
+            const yISO = `${yesterday.getFullYear()}-${String(yesterday.getMonth() + 1).padStart(2, "0")}-${String(yesterday.getDate()).padStart(2, "0")}`;
+            if (merged.lastActiveDate !== yISO && merged.pausasHoy === 0) {
+              merged.rachaDias = 0;
+            }
+          }
+          return merged;
+        } catch (err) {
+          return { ...defaultState };
+        }
+      }
+
+      let state = loadState();
+
+      function saveState() {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        } catch (err) {
+          /* Ignore storage quota errors in restricted modes */
+        }
+      }
+
+      /* =========================================================
+         3. WEB AUDIO API SYNTHESIS (100% OFFLINE GENTLE TONES)
+         ========================================================= */
+      let audioCtx = null;
+
+      function ensureAudioCtx() {
+        if (!state.soundEnabled) return null;
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        if (!AudioContextClass) return null;
+        if (!audioCtx) {
+          audioCtx = new AudioContextClass();
+        }
+        if (audioCtx.state === "suspended") {
+          audioCtx.resume().catch(function () {});
+        }
+        return audioCtx;
+      }
+
+      function playSoftTone(freq, durationSec, volume) {
+        const ctx = ensureAudioCtx();
+        if (!ctx) return;
+        try {
+          const now = ctx.currentTime;
+          const osc = ctx.createOscillator();
+          const gain = ctx.createGain();
+          osc.type = "sine";
+          osc.frequency.setValueAtTime(freq, now);
+
+          gain.gain.setValueAtTime(0.0001, now);
+          gain.gain.exponentialRampToValueAtTime(volume || 0.08, now + 0.05);
+          gain.gain.exponentialRampToValueAtTime(0.0001, now + durationSec);
+
+          osc.connect(gain);
+          gain.connect(ctx.destination);
+          osc.start(now);
+          osc.stop(now + durationSec + 0.04);
+        } catch (err) {
+          /* Safe fallback if audio blocked */
+        }
+      }
+
+      function playCompletionChime() {
+        playSoftTone(523.25, 0.28, 0.07);
+        setTimeout(function () { playSoftTone(659.25, 0.36, 0.07); }, 140);
+      }
+
+      /* =========================================================
+         4. DOM REFERENCES & UI STATE
+         ========================================================= */
+      let activeZoneFilter = "Todas";
+      let activeCapsuleCat = "Todas";
+      let capsulePageOffset = 0;
+
+      const el = {
+        html: document.documentElement,
+        themeToggleBtn: document.getElementById("themeToggleBtn"),
+        themeIcon: document.getElementById("themeIcon"),
+        themeLabel: document.getElementById("themeLabel"),
+        recognitionBanner: document.getElementById("recognitionBanner"),
+        recognitionText: document.getElementById("recognitionText"),
+        closeBannerBtn: document.getElementById("closeBannerBtn"),
+        roleSelector: document.getElementById("roleSelector"),
+        areaSelector: document.getElementById("areaSelector"),
+        timeSelector: document.getElementById("timeSelector"),
+        activeProfileSummary: document.getElementById("activeProfileSummary"),
+        statPauses: document.getElementById("statPauses"),
+        statMinutes: document.getElementById("statMinutes"),
+        statStreak: document.getElementById("statStreak"),
+        recMeta: document.getElementById("recMeta"),
+        recTitle: document.getElementById("recTitle"),
+        recReason: document.getElementById("recReason"),
+        startRecommendedBtn: document.getElementById("startRecommendedBtn"),
+        zoneFilterBar: document.getElementById("zoneFilterBar"),
+        exercisesGrid: document.getElementById("exercisesGrid"),
+        modeBoxBtn: document.getElementById("modeBoxBtn"),
+        mode478Btn: document.getElementById("mode478Btn"),
+        audioToggleBtn: document.getElementById("audioToggleBtn"),
+        audioLabel: document.getElementById("audioLabel"),
+        breathDescription: document.getElementById("breathDescription"),
+        breathOrb: document.getElementById("breathOrb"),
+        breathPhaseText: document.getElementById("breathPhaseText"),
+        breathCountdown: document.getElementById("breathCountdown"),
+        breathCycleInfo: document.getElementById("breathCycleInfo"),
+        breathStartBtn: document.getElementById("breathStartBtn"),
+        breathResetBtn: document.getElementById("breathResetBtn"),
+        decompSteps: document.getElementById("decompSteps"),
+        decompTimerStatus: document.getElementById("decompTimerStatus"),
+        decompStartBtn: document.getElementById("decompStartBtn"),
+        capsuleFilterBar: document.getElementById("capsuleFilterBar"),
+        capsulesGrid: document.getElementById("capsulesGrid"),
+        prevCapsulesBtn: document.getElementById("prevCapsulesBtn"),
+        nextCapsulesBtn: document.getElementById("nextCapsulesBtn"),
+        shiftLogList: document.getElementById("shiftLogList"),
+        resetShiftBtn: document.getElementById("resetShiftBtn"),
+        exerciseModal: document.getElementById("exerciseModal"),
+        modalZoneMeta: document.getElementById("modalZoneMeta"),
+        modalTitle: document.getElementById("modalTitle"),
+        modalCountdown: document.getElementById("modalCountdown"),
+        modalPauseBtn: document.getElementById("modalPauseBtn"),
+        modalProgressFill: document.getElementById("modalProgressFill"),
+        modalStepKicker: document.getElementById("modalStepKicker"),
+        modalStepText: document.getElementById("modalStepText"),
+        modalContraBox: document.getElementById("modalContraBox"),
+        modalPrevStepBtn: document.getElementById("modalPrevStepBtn"),
+        modalCompleteBtn: document.getElementById("modalCompleteBtn"),
+        closeModalBtn: document.getElementById("closeModalBtn")
+      };
+
+      /* =========================================================
+         5. THEME & PROFILE RENDERING
+         ========================================================= */
+      function applyTheme() {
+        el.html.setAttribute("data-theme", state.theme);
+        if (state.theme === "dark") {
+          el.themeLabel.textContent = "Modo día";
+          el.themeIcon.innerHTML = '<circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>';
+        } else {
+          el.themeLabel.textContent = "Modo noche";
+          el.themeIcon.innerHTML = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>';
+        }
+      }
+
+      function getBestExerciseForProfile() {
+        let best = EXERCISES[0];
+        let bestScore = -1;
+        EXERCISES.forEach(function (ex) {
+          let score = 0;
+          if (ex.roles.indexOf(state.role) !== -1) score += 3;
+          if (ex.areas.indexOf(state.area) !== -1) score += 2;
+          if (ex.durationSec <= state.timeBudget) score += 2;
+          if (state.timeBudget === 60 && ex.durationSec <= 60) score += 2;
+          if (score > bestScore) {
+            bestScore = score;
+            best = ex;
+          }
+        });
+        return best;
+      }
+
+      function renderProfileAndStats() {
+        el.roleSelector.querySelectorAll("[data-role]").forEach(function (btn) {
+          btn.classList.toggle("is-selected", btn.getAttribute("data-role") === state.role);
+        });
+        el.areaSelector.querySelectorAll("[data-area]").forEach(function (btn) {
+          btn.classList.toggle("is-selected", btn.getAttribute("data-area") === state.area);
+        });
+        el.timeSelector.querySelectorAll("[data-time]").forEach(function (btn) {
+          btn.classList.toggle("is-selected", Number(btn.getAttribute("data-time")) === state.timeBudget);
+        });
+
+        const timeLabel = state.timeBudget === 60 ? "Micro-pausa 60 s" : (state.timeBudget === 120 ? "2 min disponibles" : "5 min disponibles");
+        el.activeProfileSummary.textContent = `${state.role} · ${state.area} · ${timeLabel}`;
+
+        el.statPauses.textContent = String(state.pausasHoy);
+        const mins = Math.round(state.segundosHoy / 60);
+        el.statMinutes.textContent = mins > 0 ? `${mins} min` : (state.segundosHoy > 0 ? `${state.segundosHoy} s` : "0 min");
+        el.statStreak.textContent = `${state.rachaDias} d`;
+
+        const rec = getBestExerciseForProfile();
+        el.recTitle.textContent = rec.name;
+        el.recMeta.textContent = `Sugerido para ${state.role} en ${state.area} · ${rec.durationSec} s`;
+        el.recReason.textContent = rec.anatomy;
+        el.startRecommendedBtn.setAttribute("data-rec-id", rec.id);
+      }
+
+      /* =========================================================
+         6. EXERCISES CATALOG RENDERING
+         ========================================================= */
+      function renderExercises() {
+        const recId = getBestExerciseForProfile().id;
+        const filtered = EXERCISES.filter(function (ex) {
+          return activeZoneFilter === "Todas" || ex.zone === activeZoneFilter;
+        });
+
+        el.exercisesGrid.innerHTML = filtered.map(function (ex) {
+          const fitsProfile = ex.roles.indexOf(state.role) !== -1 && ex.durationSec <= state.timeBudget;
+          const isTopRec = ex.id === recId;
+          const stepsHtml = ex.steps.map(function (step, idx) {
+            return `<li><span class="step-num">${idx + 1}.</span><span>${step}</span></li>`;
+          }).join("");
+
+          return `
+            <article class="card exercise-card ${isTopRec ? "is-recommended" : ""}">
+              <div>
+                <div class="ex-meta">
+                  <span>${ex.zone}</span>
+                  <span aria-hidden="true">·</span>
+                  <span class="tabular">${ex.durationSec} seg</span>
+                  ${isTopRec ? '<span aria-hidden="true">·</span><span class="ex-rec-flag">Recomendada para tu turno</span>' : (fitsProfile ? '<span aria-hidden="true">·</span><span class="ex-rec-flag">Apta para tu tiempo</span>' : '')}
+                </div>
+                <h3 class="ex-title">${ex.name}</h3>
+                <p class="ex-anatomy">${ex.anatomy}</p>
+              </div>
+
+              <ol class="ex-steps">${stepsHtml}</ol>
+
+              <p class="ex-contra"><strong>Contraindicación:</strong> ${ex.contraindications}</p>
+
+              <div class="ex-actions">
+                <button type="button" class="btn-primary" data-start-exercise="${ex.id}">
+                  Guiar pausa (${ex.durationSec} s)
+                </button>
+              </div>
+            </article>
+          `;
+        }).join("");
+      }
+
+      /* =========================================================
+         7. GUIDED EXERCISE MODAL ENGINE
+         ========================================================= */
+      let modalTimerId = null;
+      let currentModalExercise = null;
+      let modalRemainingSec = 0;
+      let modalPaused = false;
+      let modalStepOverride = null;
+
+      function formatMMSS(sec) {
+        const m = String(Math.floor(sec / 60)).padStart(2, "0");
+        const s = String(sec % 60).padStart(2, "0");
+        return `${m}:${s}`;
+      }
+
+      function updateModalUI() {
+        if (!currentModalExercise) return;
+        const total = currentModalExercise.durationSec;
+        const elapsed = total - modalRemainingSec;
+        const pct = Math.min(100, Math.max(0, Math.round((elapsed / total) * 100)));
+        el.modalCountdown.textContent = formatMMSS(modalRemainingSec);
+        el.modalProgressFill.style.width = `${pct}%`;
+
+        const stepCount = currentModalExercise.steps.length;
+        const autoStepIdx = Math.min(stepCount - 1, Math.floor((elapsed / total) * stepCount));
+        const activeIdx = modalStepOverride !== null ? modalStepOverride : autoStepIdx;
+
+        el.modalStepKicker.textContent = `Paso ${activeIdx + 1} de ${stepCount}`;
+        el.modalStepText.textContent = currentModalExercise.steps[activeIdx];
+        el.modalPauseBtn.textContent = modalPaused ? "Reanudar" : "Pausar";
+      }
+
+      function openExerciseModal(exerciseId) {
+        const ex = EXERCISES.find(function (item) { return item.id === exerciseId; });
+        if (!ex) return;
+
+        stopExerciseModalTimer();
+        currentModalExercise = ex;
+        modalRemainingSec = ex.durationSec;
+        modalPaused = false;
+        modalStepOverride = null;
+
+        el.modalZoneMeta.textContent = `${ex.zone} · ${ex.anatomy}`;
+        el.modalTitle.textContent = ex.name;
+        el.modalContraBox.innerHTML = `<strong>Precaución clínica:</strong> ${ex.contraindications}`;
+        updateModalUI();
+
+        el.exerciseModal.classList.add("is-open");
+        playSoftTone(440, 0.16, 0.06);
+
+        let lastAutoStep = 0;
+        modalTimerId = setInterval(function () {
+          if (modalPaused) return;
+          if (modalRemainingSec > 0) {
+            modalRemainingSec -= 1;
+            const total = currentModalExercise.durationSec;
+            const elapsed = total - modalRemainingSec;
+            const stepCount = currentModalExercise.steps.length;
+            const newStep = Math.min(stepCount - 1, Math.floor((elapsed / total) * stepCount));
+            if (newStep !== lastAutoStep && modalStepOverride === null) {
+              lastAutoStep = newStep;
+              playSoftTone(523.25, 0.14, 0.05);
+            }
+            updateModalUI();
+            if (modalRemainingSec === 0) {
+              playCompletionChime();
+            }
+          }
+        }, 1000);
+      }
+
+      function stopExerciseModalTimer() {
+        if (modalTimerId) {
+          clearInterval(modalTimerId);
+          modalTimerId = null;
+        }
+      }
+
+      function closeExerciseModal() {
+        stopExerciseModalTimer();
+        el.exerciseModal.classList.remove("is-open");
+        currentModalExercise = null;
+      }
+
+      /* =========================================================
+         8. BREATHING TIMER & POST-CRITICAL DECOMPRESSION
+         ========================================================= */
+      let breathMode = "box";
+      let breathInterval = null;
+      let breathRunning = false;
+      let breathPhaseIdx = 0;
+      let breathSecLeft = 4;
+      let breathCycle = 0;
+      const BREATH_TOTAL_CYCLES = 4;
+
+      const BREATH_MODES = {
+        box: {
+          desc: "Respiración cuadrada (4 s inhala · 4 s sostén · 4 s exhala · 4 s pausa): equilibra foco y atención entre procedimientos.",
+          phases: [
+            { label: "Inhala", sec: 4, scale: 1.38, freq: 392.0 },
+            { label: "Sostén", sec: 4, scale: 1.38, freq: 440.0 },
+            { label: "Exhala", sec: 4, scale: 0.84, freq: 329.63 },
+            { label: "Pausa", sec: 4, scale: 0.84, freq: 293.66 }
+          ]
+        },
+        "478": {
+          desc: "Respiración 4-7-8 (4 s inhala · 7 s sostén · 8 s exhala): activa el freno vagal para bajar taquicardia y cortisol tras código azul.",
+          phases: [
+            { label: "Inhala", sec: 4, scale: 1.38, freq: 392.0 },
+            { label: "Sostén", sec: 7, scale: 1.38, freq: 440.0 },
+            { label: "Exhala", sec: 8, scale: 0.82, freq: 293.66 }
+          ]
+        }
+      };
+
+      function renderBreathVisual() {
+        const cfg = BREATH_MODES[breathMode];
+        const phase = cfg.phases[breathPhaseIdx];
+        el.breathDescription.textContent = cfg.desc;
+        el.breathCountdown.textContent = String(breathSecLeft).padStart(2, "0");
+
+        if (!breathRunning && breathCycle === 0) {
+          el.breathPhaseText.textContent = "Listo";
+          el.breathOrb.style.transitionDuration = "450ms";
+          el.breathOrb.style.transform = "scale(0.86)";
+          el.breathCycleInfo.textContent = `Ciclo 0 de ${BREATH_TOTAL_CYCLES} · Pulsa Iniciar para comenzar`;
+          el.breathStartBtn.textContent = "Iniciar respiración";
+        } else {
+          el.breathPhaseText.textContent = phase.label;
+          el.breathOrb.style.transitionDuration = phase.label === "Inhala" || phase.label === "Exhala" ? `${phase.sec}s` : "300ms";
+          el.breathOrb.style.transform = `scale(${phase.scale})`;
+          el.breathCycleInfo.textContent = `Ciclo ${Math.min(breathCycle + 1, BREATH_TOTAL_CYCLES)} de ${BREATH_TOTAL_CYCLES} · ${phase.label}`;
+          el.breathStartBtn.textContent = breathRunning ? "Pausar respiración" : "Continuar";
+        }
+      }
+
+      function stopBreathTimer(resetCycle) {
+        if (breathInterval) {
+          clearInterval(breathInterval);
+          breathInterval = null;
+        }
+        breathRunning = false;
+        if (resetCycle) {
+          breathPhaseIdx = 0;
+          breathCycle = 0;
+          breathSecLeft = BREATH_MODES[breathMode].phases[0].sec;
+        }
+        renderBreathVisual();
+      }
+
+      function startOrToggleBreath() {
+        if (breathRunning) {
+          stopBreathTimer(false);
+          return;
+        }
+        ensureAudioCtx();
+        breathRunning = true;
+        const initialPhase = BREATH_MODES[breathMode].phases[breathPhaseIdx];
+        playSoftTone(initialPhase.freq, 0.25, 0.06);
+        renderBreathVisual();
+
+        breathInterval = setInterval(function () {
+          if (breathSecLeft > 1) {
+            breathSecLeft -= 1;
+            el.breathCountdown.textContent = String(breathSecLeft).padStart(2, "0");
+            return;
+          }
+
+          const phases = BREATH_MODES[breathMode].phases;
+          breathPhaseIdx += 1;
+
+          if (breathPhaseIdx >= phases.length) {
+            breathPhaseIdx = 0;
+            breathCycle += 1;
+          }
+
+          if (breathCycle >= BREATH_TOTAL_CYCLES) {
+            const totalDuration = BREATH_MODES[breathMode].phases.reduce(function (acc, p) { return acc + p.sec; }, 0) * BREATH_TOTAL_CYCLES;
+            playCompletionChime();
+            stopBreathTimer(true);
+            recordCompletedPause(
+              breathMode === "box" ? "Respiración Cuadrada 4-4-4-4" : "Respiración Calma 4-7-8",
+              totalDuration,
+              "Reseteo autonómico"
+            );
+            return;
+          }
+
+          const nextPhase = phases[breathPhaseIdx];
+          breathSecLeft = nextPhase.sec;
+          playSoftTone(nextPhase.freq, 0.25, 0.06);
+          renderBreathVisual();
+        }, 1000);
+      }
+
+      /* Post-Critical Event 45s Decompression */
+      let decompTimer = null;
+      let decompSecLeft = 45;
+
+      function resetDecompUI() {
+        if (decompTimer) {
+          clearInterval(decompTimer);
+          decompTimer = null;
+        }
+        decompSecLeft = 45;
+        el.decompTimerStatus.textContent = "Duración total: 45 segundos guiados";
+        el.decompStartBtn.textContent = "Guiar descompresión (45 s)";
+        el.decompSteps.querySelectorAll(".decomp-item").forEach(function (item) {
+          item.classList.remove("is-active-step");
+        });
+      }
+
+      function toggleDecompProtocol() {
+        if (decompTimer) {
+          resetDecompUI();
+          return;
+        }
+        ensureAudioCtx();
+        decompSecLeft = 45;
+        playSoftTone(392.0, 0.22, 0.06);
+
+        function tickDecomp() {
+          const elapsed = 45 - decompSecLeft;
+          const stepIdx = Math.min(2, Math.floor(elapsed / 15));
+          el.decompSteps.querySelectorAll(".decomp-item").forEach(function (item, idx) {
+            item.classList.toggle("is-active-step", idx === stepIdx);
+          });
+          el.decompTimerStatus.textContent = `Paso ${stepIdx + 1} de 3 · Restan ${decompSecLeft} s`;
+          el.decompStartBtn.textContent = "Detener guía";
+        }
+
+        tickDecomp();
+        decompTimer = setInterval(function () {
+          decompSecLeft -= 1;
+          if (decompSecLeft <= 0) {
+            playCompletionChime();
+            resetDecompUI();
+            recordCompletedPause("Descompresión post-evento crítico (3 pasos)", 45, "Descarga emocional");
+            return;
+          }
+          if (decompSecLeft === 30 || decompSecLeft === 15) {
+            playSoftTone(440.0, 0.2, 0.05);
+          }
+          tickDecomp();
+        }, 1000);
+      }
+
+      /* =========================================================
+         9. SELF-CARE CAPSULES FEED / CAROUSEL
+         ========================================================= */
+      function renderCapsules() {
+        const filtered = CAPSULES.filter(function (cap) {
+          return activeCapsuleCat === "Todas" || cap.category === activeCapsuleCat;
+        });
+        const pageSize = window.innerWidth >= 1060 ? 4 : (window.innerWidth >= 700 ? 2 : 2);
+        if (capsulePageOffset >= filtered.length) {
+          capsulePageOffset = 0;
+        }
+
+        const visible = [];
+        for (let i = 0; i < Math.min(pageSize, filtered.length); i += 1) {
+          visible.push(filtered[(capsulePageOffset + i) % filtered.length]);
+        }
+
+        el.capsulesGrid.innerHTML = visible.map(function (cap) {
+          return `
+            <article class="card capsule-card">
+              <div>
+                <p class="capsule-kicker">${cap.category}</p>
+                <h3 class="capsule-title" style="margin-top:4px;">${cap.title}</h3>
+                <p class="capsule-body" style="margin-top:8px;">${cap.body}</p>
+              </div>
+              <p class="capsule-foot">${cap.foot}</p>
+            </article>
+          `;
+        }).join("");
+
+        const canPaginate = filtered.length > pageSize;
+        el.prevCapsulesBtn.disabled = !canPaginate;
+        el.nextCapsulesBtn.disabled = !canPaginate;
+        el.prevCapsulesBtn.style.opacity = canPaginate ? "1" : "0.45";
+        el.nextCapsulesBtn.style.opacity = canPaginate ? "1" : "0.45";
+      }
+
+      /* =========================================================
+         10. RECORDING & MOTIVATIONAL RECOGNITION (MODULE 5)
+         ========================================================= */
+      function showRecognitionMessage(minsTotal) {
+        const formattedTime = minsTotal >= 1 ? `${minsTotal} ${minsTotal === 1 ? "minuto" : "minutos"}` : `${state.segundosHoy} segundos`;
+        const messages = [
+          `Gracias por cuidar de Cali y del HUV desde ${state.area}; hoy te diste ${formattedTime} para cuidar de ti.`,
+          `Excelente pausa en tu guardia de ${state.role}. Tu salud también sostiene la vida en el Hospital Universitario del Valle.`,
+          `Has completado ${state.pausasHoy} ${state.pausasHoy === 1 ? "pausa" : "pausas"} en este turno en ${state.area}. Tu columna y mente te lo agradecen.`
+        ];
+        const msg = messages[(state.pausasHoy - 1) % messages.length];
+        el.recognitionText.textContent = msg;
+        el.recognitionBanner.classList.add("is-visible");
+      }
+
+      function recordCompletedPause(title, durationSec, zoneLabel) {
+        const today = getTodayISO();
+        if (state.lastActiveDate !== today) {
+          const prevDate = state.lastActiveDate;
+          const yesterday = new Date();
+          yesterday.setDate(yesterday.getDate() - 1);
+          const yISO = `${yesterday.getFullYear()}-${String(yesterday.getMonth() + 1).padStart(2, "0")}-${String(yesterday.getDate()).padStart(2, "0")}`;
+          state.rachaDias = prevDate === yISO ? state.rachaDias + 1 : 1;
+          state.pausasHoy = 0;
+          state.segundosHoy = 0;
+          state.shiftLog = [];
+          state.lastActiveDate = today;
+        } else if (state.rachaDias === 0) {
+          state.rachaDias = 1;
+        }
+
+        state.pausasHoy += 1;
+        state.segundosHoy += durationSec;
+        const now = new Date();
+        const hh = String(now.getHours()).padStart(2, "0");
+        const mm = String(now.getMinutes()).padStart(2, "0");
+
+        state.shiftLog.unshift({
+          title: title,
+          zone: zoneLabel,
+          durationSec: durationSec,
+          time: `${hh}:${mm}`
+        });
+        if (state.shiftLog.length > 15) {
+          state.shiftLog.pop();
+        }
+
+        saveState();
+        renderProfileAndStats();
+        renderShiftLog();
+        showRecognitionMessage(Math.max(1, Math.round(state.segundosHoy / 60)));
+      }
+
+      function renderShiftLog() {
+        if (!state.shiftLog || state.shiftLog.length === 0) {
+          el.shiftLogList.innerHTML = '<p class="log-empty">Aún no registras pausas en este turno. Completa una rutina o ciclo respiratorio para iniciar tu registro.</p>';
+          return;
+        }
+        el.shiftLogList.innerHTML = state.shiftLog.map(function (entry) {
+          return `
+            <div class="log-row">
+              <div>
+                <strong>${entry.title}</strong>
+                <div class="rec-meta">${entry.zone} · ${entry.durationSec} seg</div>
+              </div>
+              <span class="rec-meta tabular">${entry.time}</span>
+            </div>
+          `;
+        }).join("");
+      }
+
+      /* =========================================================
+         11. EVENT LISTENERS
+         ========================================================= */
+      el.themeToggleBtn.addEventListener("click", function () {
+        state.theme = state.theme === "dark" ? "light" : "dark";
+        saveState();
+        applyTheme();
+      });
+
+      el.closeBannerBtn.addEventListener("click", function () {
+        el.recognitionBanner.classList.remove("is-visible");
+      });
+
+      el.roleSelector.addEventListener("click", function (e) {
+        const btn = e.target.closest("[data-role]");
+        if (!btn) return;
+        state.role = btn.getAttribute("data-role");
+        saveState();
+        renderProfileAndStats();
+        renderExercises();
+      });
+
+      el.areaSelector.addEventListener("click", function (e) {
+        const btn = e.target.closest("[data-area]");
+        if (!btn) return;
+        state.area = btn.getAttribute("data-area");
+        saveState();
+        renderProfileAndStats();
+        renderExercises();
+      });
+
+      el.timeSelector.addEventListener("click", function (e) {
+        const btn = e.target.closest("[data-time]");
+        if (!btn) return;
+        state.timeBudget = Number(btn.getAttribute("data-time"));
+        saveState();
+        renderProfileAndStats();
+        renderExercises();
+      });
+
+      el.startRecommendedBtn.addEventListener("click", function () {
+        const id = el.startRecommendedBtn.getAttribute("data-rec-id");
+        if (id) openExerciseModal(id);
+      });
+
+      el.zoneFilterBar.addEventListener("click", function (e) {
+        const btn = e.target.closest("[data-zone]");
+        if (!btn) return;
+        activeZoneFilter = btn.getAttribute("data-zone");
+        el.zoneFilterBar.querySelectorAll(".filter-btn").forEach(function (b) {
+          b.classList.toggle("is-active", b === btn);
+        });
+        renderExercises();
+      });
+
+      el.exercisesGrid.addEventListener("click", function (e) {
+        const btn = e.target.closest("[data-start-exercise]");
+        if (!btn) return;
+        openExerciseModal(btn.getAttribute("data-start-exercise"));
+      });
+
+      /* Modal Controls */
+      el.closeModalBtn.addEventListener("click", closeExerciseModal);
+      el.exerciseModal.addEventListener("click", function (e) {
+        if (e.target === el.exerciseModal) closeExerciseModal();
+      });
+      document.addEventListener("keydown", function (e) {
+        if (e.key === "Escape" && el.exerciseModal.classList.contains("is-open")) {
+          closeExerciseModal();
+        }
+      });
+
+      el.modalPauseBtn.addEventListener("click", function () {
+        modalPaused = !modalPaused;
+        updateModalUI();
+      });
+
+      el.modalPrevStepBtn.addEventListener("click", function () {
+        if (!currentModalExercise) return;
+        const stepCount = currentModalExercise.steps.length;
+        const total = currentModalExercise.durationSec;
+        const elapsed = total - modalRemainingSec;
+        const autoIdx = Math.min(stepCount - 1, Math.floor((elapsed / total) * stepCount));
+        const curr = modalStepOverride !== null ? modalStepOverride : autoIdx;
+        modalStepOverride = (curr - 1 + stepCount) % stepCount;
+        updateModalUI();
+      });
+
+      el.modalCompleteBtn.addEventListener("click", function () {
+        if (!currentModalExercise) return;
+        const completed = currentModalExercise;
+        playCompletionChime();
+        closeExerciseModal();
+        recordCompletedPause(completed.name, completed.durationSec, completed.zone);
+      });
+
+      /* Breathing Controls */
+      el.modeBoxBtn.addEventListener("click", function () {
+        breathMode = "box";
+        el.modeBoxBtn.classList.add("is-selected");
+        el.mode478Btn.classList.remove("is-selected");
+        stopBreathTimer(true);
+      });
+
+      el.mode478Btn.addEventListener("click", function () {
+        breathMode = "478";
+        el.mode478Btn.classList.add("is-selected");
+        el.modeBoxBtn.classList.remove("is-selected");
+        stopBreathTimer(true);
+      });
+
+      el.audioToggleBtn.addEventListener("click", function () {
+        state.soundEnabled = !state.soundEnabled;
+        saveState();
+        el.audioToggleBtn.setAttribute("aria-pressed", String(state.soundEnabled));
+        el.audioLabel.textContent = state.soundEnabled ? "Sonido activo" : "Silenciado";
+        if (state.soundEnabled) playSoftTone(440, 0.12, 0.05);
+      });
+
+      el.breathStartBtn.addEventListener("click", startOrToggleBreath);
+      el.breathResetBtn.addEventListener("click", function () {
+        stopBreathTimer(true);
+      });
+
+      /* Decompression Controls */
+      el.decompStartBtn.addEventListener("click", toggleDecompProtocol);
+
+      /* Capsules Controls */
+      el.capsuleFilterBar.addEventListener("click", function (e) {
+        const btn = e.target.closest("[data-cap-cat]");
+        if (!btn) return;
+        activeCapsuleCat = btn.getAttribute("data-cap-cat");
+        capsulePageOffset = 0;
+        el.capsuleFilterBar.querySelectorAll(".filter-btn").forEach(function (b) {
+          b.classList.toggle("is-active", b === btn);
+        });
+        renderCapsules();
+      });
+
+      el.prevCapsulesBtn.addEventListener("click", function () {
+        const filtered = CAPSULES.filter(function (c) { return activeCapsuleCat === "Todas" || c.category === activeCapsuleCat; });
+        capsulePageOffset = (capsulePageOffset - 2 + filtered.length) % filtered.length;
+        renderCapsules();
+      });
+
+      el.nextCapsulesBtn.addEventListener("click", function () {
+        const filtered = CAPSULES.filter(function (c) { return activeCapsuleCat === "Todas" || c.category === activeCapsuleCat; });
+        capsulePageOffset = (capsulePageOffset + 2) % filtered.length;
+        renderCapsules();
+      });
+
+      window.addEventListener("resize", renderCapsules);
+
+      /* Reset Current Shift Log */
+      el.resetShiftBtn.addEventListener("click", function () {
+        state.pausasHoy = 0;
+        state.segundosHoy = 0;
+        state.shiftLog = [];
+        saveState();
+        renderProfileAndStats();
+        renderShiftLog();
+        el.recognitionBanner.classList.remove("is-visible");
+      });
+
+      /* Active Navigation Highlighting */
+      document.querySelectorAll("[data-nav]").forEach(function (link) {
+        link.addEventListener("click", function () {
+          const target = link.getAttribute("data-nav");
+          document.querySelectorAll("[data-nav]").forEach(function (item) {
+            item.classList.toggle("is-active", item.getAttribute("data-nav") === target);
+          });
+        });
+      });
+
+      /* =========================================================
+         12. INITIAL BOOTSTRAP
+         ========================================================= */
+      applyTheme();
+      el.audioToggleBtn.setAttribute("aria-pressed", String(state.soundEnabled));
+      el.audioLabel.textContent = state.soundEnabled ? "Sonido activo" : "Silenciado";
+      renderProfileAndStats();
+      renderExercises();
+      renderBreathVisual();
+      renderCapsules();
+      renderShiftLog();
+    })();
+  </script>
+</body>
+</html>
